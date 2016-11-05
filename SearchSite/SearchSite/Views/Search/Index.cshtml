@@ -1,0 +1,127 @@
+﻿@model SearchSite.Models.SearchDetailViewModel
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Search</h2>
+@if (!string.IsNullOrEmpty(ViewBag.Message))
+{
+    <br />
+    <div class="bs-example">
+        <div class="alert alert-success fade in">
+            <a href="#" class="close" data-dismiss="alert">&times;</a>
+            <strong>Success!</strong> @ViewBag.Message
+        </div>
+    </div>
+}
+
+<div class="panel-body">
+    @using (Html.BeginForm("Index", "Search", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    {
+        <div class="form-group">
+            <div class="col-md-offset-5">
+                @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-6">
+                    @Html.EditorFor(model => model.Location, new { htmlAttributes = new { @class = "form-control", @autofocus = "autofocus", @id = "Location" } })
+                    @Html.ValidationMessageFor(model => model.Location, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3">
+                @Html.LabelFor(model => model.CheckIn, htmlAttributes: new { @class = "control-label" })
+                @Html.EditorFor(model => model.CheckIn, new { htmlAttributes = new { @class = "form-control date", @id = "CheckIn" } })
+                @Html.ValidationMessageFor(model => model.CheckIn, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-3">
+                @Html.LabelFor(model => model.CheckOut, htmlAttributes: new { @class = "control-label" })
+                @Html.EditorFor(model => model.CheckOut, new { htmlAttributes = new { @class = "form-control date", @id = "CheckOut" } })
+                @Html.ValidationMessageFor(model => model.CheckOut, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-4">
+                @Html.LabelFor(model => model.RoomsCount, htmlAttributes: new { @class = "control-label" })
+                <select class="form-control" id="RoomsCount" name="RoomsCount">
+                    <option value="">Select rooms</option>
+                    @for (int i = 1; i <= 9; i++)
+                    {
+                        <option value="@i">@i</option>
+                    }
+                </select>
+                @Html.ValidationMessageFor(model => model.RoomsCount, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <br />
+        <div id="roomsList">
+
+        </div>
+
+
+        <div class="form-group">
+            <div class="col-md-offset-8 col-md-10">
+                <input type="submit" class="btn btn-primary" value="Submit" />
+            </div>
+        </div>
+
+
+    }
+</div>
+<script>
+    $(document).ready(function () {
+
+        $('.date').datepicker({
+            format: "mm/dd/yyyy", startDate: '+0d', autoclose: true
+        });
+
+        $(document).on('change', '#CheckIn', function () {
+            var fromdate = $('#CheckIn').val();
+            var date = (new Date(fromdate));
+            date.setDate(date.getDate() + 1);
+            $('#CheckOut').data('datepicker').setStartDate(date);
+            $("#CheckOut").val("");
+        });
+
+        $(document).on('change', '#RoomsCount', function () {
+            var roomsCount = parseInt($('#RoomsCount').val());
+            $('#roomsList').empty();
+            $.ajax({
+                url: '@Url.Action("InsertRoomList", "Search")?count=' + roomsCount,
+                success: function (response) {
+                    $("#roomsList").html(response);
+                },
+                error: function () {
+                    alert("error occured");
+                }
+            });
+
+        });
+
+        $("#Location").autocomplete({
+            minLength: 2,
+            source: function (req, resp) { 
+                $.ajax({
+                    url: '@Url.Action("LocationSearch","Search")',
+                    type: "POST",
+                    dataType: "json",
+                    data: { term: req.term },
+                    success: function (data) {
+                        resp($.map(data, function (item) {
+                            return { label: item, value: item };
+                        }));
+                    }
+                });
+            },
+            select: function (event, ui) { 
+                var selected = ui.item;
+                var mdlNum, mdlName;
+                if (selected.value !== null) {
+                    $("#Location").val(selected);
+                }
+            }
+        });
+
+    });
+
+
+</script>
+
+

@@ -1,0 +1,35 @@
+﻿@model IEnumerable<SearchSite.Models.RoomViewModel>
+@{var count = 1;}
+@foreach (var room in Model)
+{
+    <div class="form-group">
+        <div class="col-md-2">
+            <label for="RoomLabel" class="control-label">Room @count</label>
+        </div>
+        <div class="col-md-4">
+            @Html.LabelFor(model => room.Adults, htmlAttributes: new { @class = "control-label" })
+            <div class="col-md-3">
+                <select class="form-control" name="RoomsList[@(count-1)].Adults">
+                    @for (int i = 1; i <= 9; i++)
+                    {
+                        <option value="@i">@i</option>
+                    }
+                </select>
+                @Html.ValidationMessageFor(model => room.Adults, "", new { @class = "text-danger" })
+            </div>
+        </div><div class="col-md-4">
+            @Html.LabelFor(model => room.Children, htmlAttributes: new { @class = "control-label" })
+            <div class="col-md-3">
+                <select class="form-control" name="RoomsList[@(count-1)].Children">
+                    @for (int i = 1; i <= 9; i++)
+                    {
+                        <option value="@i">@i</option>
+                    }
+                </select>
+                @Html.ValidationMessageFor(model => room.Children, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+
+                    count++;
+}
