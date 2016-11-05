@@ -84,7 +84,7 @@
             var roomsCount = parseInt($('#RoomsCount').val());
             $('#roomsList').empty();
             $.ajax({
-                url: '@Url.Action("InsertRoomList", "Search")?count=' + roomsCount,
+                url: '@Url.Action("InsertRoomList", "Search")?count=' + (isNaN(roomsCount) ? 0 : roomsCount),
                 success: function (response) {
                     $("#roomsList").html(response);
                 },
@@ -97,7 +97,7 @@
 
         $("#Location").autocomplete({
             minLength: 2,
-            source: function (req, resp) { 
+            source: function (req, resp) {
                 $.ajax({
                     url: '@Url.Action("LocationSearch","Search")',
                     type: "POST",
@@ -110,7 +110,7 @@
                     }
                 });
             },
-            select: function (event, ui) { 
+            select: function (event, ui) {
                 var selected = ui.item;
                 var mdlNum, mdlName;
                 if (selected.value !== null) {
@@ -123,5 +123,4 @@
 
 
 </script>
-
 
